@@ -12,7 +12,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card'
-import Map from '@/components/Map'
+import Map from '@/Components/Map'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 export default function Dashboard({ auth }) {

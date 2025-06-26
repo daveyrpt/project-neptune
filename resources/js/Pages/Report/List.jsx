@@ -16,11 +16,11 @@ import {
     Map as MapIcon,
 } from 'lucide-react'
 
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Card } from '@/Components/ui/card'
+import { Badge } from '@/Components/ui/badge'
+import { Button } from '@/Components/ui/button'
 import { useToast } from '@/Components/ui/use-toast'
-import { Toaster } from '@/components/ui/toaster'
+import { Toaster } from '@/Components/ui/toaster'
 import { nanoid } from 'nanoid'
 import {
     Sheet,
@@ -29,9 +29,9 @@ import {
     SheetTitle,
     SheetDescription,
     SheetTrigger,
-} from '@/components/ui/sheet'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
+} from '@/Components/ui/sheet'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/Components/ui/select'
+import { Textarea } from '@/Components/ui/textarea'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'

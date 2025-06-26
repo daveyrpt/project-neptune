@@ -12,7 +12,7 @@ import {
     Shield,
     Siren,
 } from 'lucide-react';
-import { Toaster } from '@/components/ui/toaster'
+import { Toaster } from '@/Components/ui/toaster'
 export default function AuthenticatedLayout({ user, children, currentRoute }) {
     const { auth } = usePage().props;
 

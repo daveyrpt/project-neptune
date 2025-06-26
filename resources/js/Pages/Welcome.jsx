@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react'
 import { Flame, Zap, MapPin, PhoneCall, LayoutDashboard } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card'
+import { Button } from '@/Components/ui/button'
 
 export default function Welcome() {
   return (
