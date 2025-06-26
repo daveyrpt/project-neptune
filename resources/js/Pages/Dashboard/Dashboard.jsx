@@ -11,7 +11,7 @@ import {
   CloudDrizzle,
   LogOut,
 } from 'lucide-react'
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card'
 import Map from '@/components/Map'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
