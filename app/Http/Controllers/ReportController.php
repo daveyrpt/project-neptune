@@ -32,7 +32,7 @@ class ReportController extends Controller
 {
     public function index()
     {
-        $details = Incident::get();
+        $details = Incident::orderBy('created_at', 'desc')->get();
 
         // dd($details[0]->gps);
 
