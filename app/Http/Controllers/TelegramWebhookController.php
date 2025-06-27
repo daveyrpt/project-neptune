@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Incident;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class TelegramWebhookController extends Controller
 {
@@ -23,26 +24,42 @@ class TelegramWebhookController extends Controller
                 return response()->json(['ok' => false, 'message' => 'No message']);
             }
 
-            $text = $message['text'] ?? '[no text]';
             $chatId = $message['chat']['id'] ?? null;
+            $text = $message['text'] ?? null;
             $location = $message['location'] ?? null;
 
-            Log::info("🧾 Parsed message: {$text}");
             Log::info("👤 Chat ID: {$chatId}");
-            if ($location) {
-                Log::info("📍 Location: lat={$location['latitude']}, lon={$location['longitude']}");
+
+            if ($text && !$location) {
+                Log::info("💬 Storing text message for chat {$chatId}: {$text}");
+                Cache::put("incident_draft_text_{$chatId}", $text, 300); // 5 min cache
             }
 
-            $incident = new Incident();
-            $incident->source = 'telegram';
-            $incident->message = $text;
-            $incident->chat_id = $chatId;
-            $incident->latitude = $location['latitude'] ?? null;
-            $incident->longitude = $location['longitude'] ?? null;
-            $incident->status = 'baru';
-            $incident->save();
+            if ($location) {
+                Log::info("📍 Location: lat={$location['latitude']}, lon={$location['longitude']}");
 
-            Log::info("✅ Incident saved. ID: {$incident->id}");
+                $cachedText = Cache::get("incident_draft_text_{$chatId}");
+
+                if ($cachedText) {
+                    Log::info("🧾 Found cached message: {$cachedText}");
+
+                    $incident = new Incident();
+                    $incident->source = 'telegram';
+                    $incident->message = $cachedText;
+                    $incident->chat_id = $chatId;
+                    $incident->latitude = $location['latitude'];
+                    $incident->longitude = $location['longitude'];
+                    $incident->status = 'baru';
+                    $incident->save();
+
+                    Cache::forget("incident_draft_text_{$chatId}");
+
+                    Log::info("✅ Incident saved. ID: {$incident->id}");
+                } else {
+                    Log::info("📍 Location received, but no text message cached yet for chat {$chatId}");
+                }
+            }
+
             return response()->json(['ok' => true]);
         } catch (\Throwable $e) {
             Log::error('❌ Error processing Telegram webhook: ' . $e->getMessage(), [

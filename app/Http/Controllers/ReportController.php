@@ -9,6 +9,7 @@ use App\Models\Counter;
 use App\Models\Customer;
 use App\Models\FloatCash;
 use App\Models\FloatCashRequest;
+use App\Models\Incident;
 use App\Models\IncomeCode;
 use App\Models\OpenedCounter;
 use App\Models\PaymentType;
@@ -31,8 +32,13 @@ class ReportController extends Controller
 {
     public function index()
     {
+        $details = Incident::get();
+
+        // dd($details[0]->gps);
+
         return Inertia::render('Report/Index',[
             'currentRoute' => Route::currentRouteName(),
+            'details' => $details
         ]);
 
         // auth()->user()->hasPermission('read report') ?: abort(403);
