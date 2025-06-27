@@ -31,13 +31,28 @@ class TelegramWebhookController extends Controller
 
         // return response()->json(['ok' => true]);
 
-        $data = $request->all();
-        $message = $data['message'] ?? null;
+        Log::info('🔔 Telegram webhook hit');
 
-        if ($message) {
-            $text = $message['text'] ?? null;
-            $chatId = $message['chat']['id'];
+        try {
+            $data = $request->all();
+            Log::info('📥 Raw incoming data:', $data);
+
+            $message = $data['message'] ?? null;
+
+            if (!$message) {
+                Log::warning('⚠️ No "message" field in payload.');
+                return response()->json(['ok' => false, 'message' => 'No message']);
+            }
+
+            $text = $message['text'] ?? '[no text]';
+            $chatId = $message['chat']['id'] ?? null;
             $location = $message['location'] ?? null;
+
+            Log::info("🧾 Parsed message: {$text}");
+            Log::info("👤 Chat ID: {$chatId}");
+            if ($location) {
+                Log::info("📍 Location: lat={$location['latitude']}, lon={$location['longitude']}");
+            }
 
             $incident = new Incident();
             $incident->source = 'telegram';
@@ -47,8 +62,14 @@ class TelegramWebhookController extends Controller
             $incident->longitude = $location['longitude'] ?? null;
             $incident->status = 'baru';
             $incident->save();
-        }
 
-        return response()->json(['ok' => true]);
+            Log::info("✅ Incident saved. ID: {$incident->id}");
+            return response()->json(['ok' => true]);
+        } catch (\Throwable $e) {
+            Log::error('❌ Error processing Telegram webhook: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+        }
     }
 }
