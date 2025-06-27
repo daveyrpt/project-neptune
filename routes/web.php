@@ -44,7 +44,7 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-
+Route::post('/telegram/webhook', [TelegramWebhookController::class, 'handle']);
 // Route::redirect('/', 'login');
 Route::get('/auth/callback', [KeycloakCustomController::class, 'handleCallback']);
 
@@ -153,7 +153,7 @@ Route::get('/auth/callback', [KeycloakCustomController::class, 'handleCallback']
         Route::get('/audit', [ReportController::class, 'audit'])->name('report.audit');
         Route::get('/audit/pdf', [ReportController::class, 'auditPrint'])->name('report.auditPrint');
 
-        Route::post('/telegram/webhook', [TelegramWebhookController::class, 'handle']);
+        
 
 });
 
