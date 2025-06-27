@@ -16,6 +16,7 @@ use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\SystemController;
+use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\TerminalManagementController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -151,6 +152,9 @@ Route::get('/auth/callback', [KeycloakCustomController::class, 'handleCallback']
         Route::get('/incidents/{id}/pdf', [ReportController::class, 'downloadPdf'])->name('incidents.pdf');
         Route::get('/audit', [ReportController::class, 'audit'])->name('report.audit');
         Route::get('/audit/pdf', [ReportController::class, 'auditPrint'])->name('report.auditPrint');
+
+        Route::post('/telegram/webhook', [TelegramWebhookController::class, 'handle']);
+
 });
 
 
