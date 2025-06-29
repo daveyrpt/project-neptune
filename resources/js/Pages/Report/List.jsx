@@ -201,6 +201,7 @@ const incidents = [
 export default function Completed({ auth }) {
     const [selected, setSelected] = useState(null)
 
+    const [jenis, setJenis] = useState('');
     // Approve / Reject — replace with real routes
     const approve = (id) => router.post(route('incidents.approve', id))
     const reject = (id) => router.post(route('incidents.reject', id))
@@ -371,11 +372,22 @@ function IncidentDetails({ inc }) {
 
                     {/* right column */}
                     <div className="space-y-4">
-                        <SelectField label="Status" placeholder="Baharu" />
-                        <SelectField label="Keutamaan" placeholder="Sederhana" />
-                        <SelectField label="Jenis Bahaya" placeholder="Kebakaran" />
-                        <SelectField label="Tugaskan Stesen" placeholder="Pilih stesen bomba" />
-
+                        <SelectField label="Status" placeholder="Baharu" 
+                            options={['Baharu', 'Dalam Proses', 'Selesai']}
+                        />
+                        <SelectField label="Keutamaan" placeholder="Pilih Keutamaan" 
+                            options={['Kritikal', 'Sederhana']}
+                        />
+                        <SelectField
+                            label="Jenis Kecemasan"
+                            placeholder="Pilih jenis"
+                            options={['Khidmat Khas', 'Kebakaran', 'Khidmat Kemanusiaan']}
+                        />
+                        <Field label="No. Bil" value='01/25' />
+                        <div>
+                            <label className="block mb-1 font-medium">Anggaran Kerugian</label>
+                            <Textarea placeholder="Tambah anggaran kerugian..." className="h-6" />
+                        </div>
                         <div>
                             <label className="block mb-1 font-medium">Nota Dalaman</label>
                             <Textarea placeholder="Tambah nota untuk pasukan…" className="h-32" />
@@ -413,7 +425,7 @@ function Field({ label, value, children }) {
 }
 
 /* select field wrapper ----------------------------------------------------- */
-function SelectField({ label, placeholder }) {
+function SelectField({ label, placeholder, options = [] }) {
     return (
         <div>
             <label className="block mb-1 font-medium">{label}</label>
@@ -422,8 +434,11 @@ function SelectField({ label, placeholder }) {
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="1">Contoh 1</SelectItem>
-                    <SelectItem value="2">Contoh 2</SelectItem>
+                    {options.map((opt) => (
+                        <SelectItem key={opt} value={opt}>
+                            {opt}
+                        </SelectItem>
+                    ))}
                 </SelectContent>
             </Select>
         </div>

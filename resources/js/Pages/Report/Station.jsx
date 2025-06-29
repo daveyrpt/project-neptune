@@ -36,17 +36,6 @@ const stations = [
     koordinat: '5.9504, 116.0832',
   },
   {
-    id: 'BBKK-03',
-    nama: 'Balai Bomba Inanam',
-    alamat: 'Lorong Kionsom, Inanam, 88450 Kota Kinabalu',
-    telefon: '088-223114',
-    kelas: 'Rural',
-    status: 'Penyelenggaraan',
-    anggota: 35,
-    jentera: 3,
-    koordinat: '6.0122, 116.1199',
-  },
-  {
     id: 'BBKK-04',
     nama: 'Balai Bomba Penampang',
     alamat: 'Jalan Penampang, 89500 KK',
@@ -56,17 +45,6 @@ const stations = [
     anggota: 40,
     jentera: 4,
     koordinat: '5.9302, 116.0720',
-  },
-  {
-    id: 'BBKK-05',
-    nama: 'Balai Bomba Lapangan Terbang KKIA',
-    alamat: 'Terminal 2, KK International Airport, 88000 KK',
-    telefon: '088-226424',
-    kelas: 'Airport',
-    status: 'Aktif',
-    anggota: 28,
-    jentera: 2,
-    koordinat: '5.9266, 116.0489',
   },
 ]
 

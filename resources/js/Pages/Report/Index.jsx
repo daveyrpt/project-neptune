@@ -158,23 +158,6 @@ const initialIncidents = [
         tugasan: '',
     },
     {
-        id: 108,
-        lokasi: 'Menggatal, Kota Kinabalu',
-        tahap: 'Responding',
-        status: 'Critical',
-        message:
-            'Kilang kayu terbakar. Terdapat api besar dan asap tebal. Kebakaran dipercayai bermula dari mesin pemotong.',
-        masa: '11:45',
-        tarikh: '26/06/2025',
-        sumber: 'Phone',
-        pegawai: 'Henry Goh',
-        phone: '+60195551133',
-        address: 'Jalan Sepangar, Menggatal, 88450 Kota Kinabalu',
-        foto: 4,
-        gps: '6.0799, 116.1256',
-        tugasan: 'Balai Bomba Inanam',
-    },
-    {
         id: 109,
         lokasi: 'Bandar Sierra, Kota Kinabalu',
         tahap: 'New',
@@ -430,11 +413,22 @@ function IncidentDetails({ inc }) {
 
                     {/* right column */}
                     <div className="space-y-4">
-                        <SelectField label="Status" placeholder="Baharu" />
-                        <SelectField label="Keutamaan" placeholder="Sederhana" />
-                        <SelectField label="Jenis Bahaya" placeholder="Kebakaran" />
-                        <SelectField label="Tugaskan Stesen" placeholder="Pilih stesen bomba" />
-
+                        <SelectField label="Status" placeholder="Baharu" 
+                            options={['Baharu', 'Dalam Proses', 'Selesai']}
+                        />
+                        <SelectField label="Keutamaan" placeholder="Pilih Keutamaan" 
+                            options={['Kritikal', 'Sederhana']}
+                        />
+                        <SelectField
+                            label="Jenis Kecemasan"
+                            placeholder="Pilih jenis"
+                           options={['Khidmat Khas', 'Kebakaran', 'Khidmat Kemanusiaan']}
+                        />
+                        <Field label="No. Bil" value='01/25' />
+                                                <div>
+                                                    <label className="block mb-1 font-medium">Anggaran Kerugian</label>
+                                                    <Textarea placeholder="Tambah anggaran kerugian..." className="h-6" />
+                                                </div>
                         <div>
                             <label className="block mb-1 font-medium">Nota Dalaman</label>
                             <Textarea placeholder="Tambah nota untuk pasukan…" className="h-32" />
@@ -472,7 +466,7 @@ function Field({ label, value, children }) {
 }
 
 /* select field wrapper ----------------------------------------------------- */
-function SelectField({ label, placeholder }) {
+function SelectField({ label, placeholder, options = [] }) {
     return (
         <div>
             <label className="block mb-1 font-medium">{label}</label>
@@ -481,11 +475,15 @@ function SelectField({ label, placeholder }) {
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="1">Contoh 1</SelectItem>
-                    <SelectItem value="2">Contoh 2</SelectItem>
+                    {options.map((opt) => (
+                        <SelectItem key={opt} value={opt}>
+                            {opt}
+                        </SelectItem>
+                    ))}
                 </SelectContent>
             </Select>
         </div>
     )
 }
+
 

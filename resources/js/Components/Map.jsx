@@ -166,15 +166,6 @@ const stations = [
     coverage: 3000,        // ← 3 km radius
   },
   {
-    latlng: [6.0122, 116.1199],
-    nama: 'Balai Bomba Inanam',
-    kelas: 'Rural',
-    telefon: '088-334455',
-    anggota: 35,
-    jentera: 3,
-    coverage: 3000,        // ← 3 km radius
-  },
-  {
     latlng: [5.9266, 116.0489],
     nama: 'Balai Bomba KKIA',
     kelas: 'Airport',

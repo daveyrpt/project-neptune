@@ -57,7 +57,7 @@
         <td>hasanah</td>
         <td>Tugaskan</td>
         <td>Insiden #1999</td>
-        <td>Tugaskan kepada <strong>Balai Bomba Inanam</strong></td>
+        <td>Tugaskan kepada <strong>Balai Bomba Kota Kinabalu</strong></td>
       </tr>
       <tr>
         <td>3</td>

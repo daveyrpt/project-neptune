@@ -152,7 +152,7 @@ Route::get('/auth/callback', [KeycloakCustomController::class, 'handleCallback']
         Route::get('/incidents/{id}/pdf', [ReportController::class, 'downloadPdf'])->name('incidents.pdf');
         Route::get('/audit', [ReportController::class, 'audit'])->name('report.audit');
         Route::get('/audit/pdf', [ReportController::class, 'auditPrint'])->name('report.auditPrint');
-
+        Route::get('/statistic', [ReportController::class, 'statistic'])->name('report.statistic');
         
 
 });

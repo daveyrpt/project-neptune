@@ -96,6 +96,13 @@ class ReportController extends Controller
         ]);
     }
 
+    public function statistic()
+    {
+        return Inertia::render('Report/Statistic',[
+            'currentRoute' => Route::currentRouteName(),
+        ]);
+    }
+
     public function list()
     {
         return Inertia::render('Report/List',[
@@ -115,12 +122,12 @@ class ReportController extends Controller
         $incident = (object) [
             'id'       => 301,
             'lokasi'   => 'Pasar Filipina, Kota Kinabalu',
-            'tahap'    => 'Resolved',
-            'status'   => 'Low',
+            'tahap'    => 'Selesai',
+            'status'   => 'Sederhana',
             'message'  => 'Kebakaran kecil gerai makanan berjaya dipadamkan. Tiada kecederaan dilaporkan.',
             'masa'     => '18:05',
             'tarikh'   => '26/06/2025',
-            'sumber'   => 'WhatsApp',
+            'sumber'   => 'Telegram',
             'pegawai'  => 'Azahari Salleh',
             'phone'    => '+60129991100',
             'address'  => 'Jalan Tun Fuad Stephens, 88000 Kota Kinabalu',

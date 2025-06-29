@@ -11,6 +11,7 @@ import {
     Hospital,
     Shield,
     Siren,
+    ChartBar,
 } from 'lucide-react';
 import { Toaster } from '@/Components/ui/toaster'
 export default function AuthenticatedLayout({ user, children, currentRoute }) {
@@ -45,6 +46,7 @@ export default function AuthenticatedLayout({ user, children, currentRoute }) {
                     </div>
                 </div>
                 <nav className="space-y-2">
+                    <NavItem href="/statistic" label="Statistik" icon={<ChartBar size={18} />} currentRoute={currentRoute} />
                     <NavItem href="/dashboard" label="Peta Insiden" icon={<MapPin size={18} />} currentRoute={currentRoute} />
                     <NavItem href="/report" label="Kecemasan" icon={<Siren size={18} />} currentRoute={currentRoute} badge="3" />
                     <NavItem href="/hydrant" label="Status Pili Bomba" icon={<Droplet size={18} />} currentRoute={currentRoute} />

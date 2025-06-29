@@ -8,12 +8,30 @@ import {
     FileText,
     Wrench,
     CheckCircle,
+    Eye,
+    Badge,
 } from 'lucide-react';
-
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetDescription,
+    SheetTrigger,
+} from '@/Components/ui/sheet';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/Components/ui/select'
+import { Button } from '@/Components/ui/button';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet-defaulticon-compatibility'
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
+import { Textarea } from '@/Components/ui/textarea'
+import React, { useState } from 'react';
 const hydrants = [
   {
     id: 'KK-001',
     lokasi: 'Jalan Gaya',
+    latlng: '5.9810, 116.0735',
     alamat: 'Hadapan Restoran Fook Yuen, Jalan Gaya, 88000 Kota Kinabalu, Sabah',
     status: 'Aktif',
     tekanan: 'Normal',
@@ -24,6 +42,7 @@ const hydrants = [
   {
     id: 'KK-002',
     lokasi: 'Suria Sabah',
+    latlng: '5.9833, 116.0711',
     alamat: 'Pintu Masuk Utama, Suria Sabah Shopping Mall, 88000 KK',
     status: 'Aktif',
     tekanan: 'Tinggi',
@@ -34,6 +53,7 @@ const hydrants = [
   {
     id: 'KK-003',
     lokasi: 'Sutera Harbour',
+    latlng: '5.9762, 116.0689',
     alamat: 'Berhampiran Bangunan Magellan, Sutera Harbour, 88100 KK',
     status: 'Rosak',
     tekanan: 'Tiada',
@@ -44,6 +64,7 @@ const hydrants = [
   {
     id: 'KK-004',
     lokasi: 'Api-Api Centre',
+    latlng: '5.9825, 116.0750',
     alamat: 'Jalan Coastal, Api-Api Centre, 88000 Kota Kinabalu',
     status: 'Penyelenggaraan',
     tekanan: 'Rendah',
@@ -54,6 +75,7 @@ const hydrants = [
   {
     id: 'KK-005',
     lokasi: 'Tanjung Aru',
+    latlng: '5.9851, 116.0794',
     alamat: 'Jalan Mat Salleh, bersebelahan SMK Tanjung Aru, 88100 KK',
     status: 'Aktif',
     tekanan: 'Normal',
@@ -78,6 +100,7 @@ const tekananColors = {
 };
 
 export default function Hydrant({ auth }) {
+        const [selected, setSelected] = useState(null)
     return (
         <AuthenticatedLayout user={auth.user} currentRoute="/hydrant">
             <Head title="Status Pili Bomba" />
@@ -175,9 +198,18 @@ export default function Hydrant({ auth }) {
                     {h.status}
                 </div>
                 <div className="flex gap-2">
-                    <button className="border rounded-md px-3 py-1 text-sm flex items-center gap-1 hover:bg-gray-50">
+                    {/* <button className="border rounded-md px-3 py-1 text-sm flex items-center gap-1 hover:bg-gray-50">
                         <MapPin size={14} /> Lokasi
-                    </button>
+                    </button> */}
+                                        <Sheet>
+
+                                            <SheetTrigger asChild onClick={() => setSelected(h)}>
+                                                <Button size="sm" variant="outline" className="gap-1">
+                                                    <Eye size={14} /> Lihat
+                                                </Button>
+                                            </SheetTrigger>
+
+                                        </Sheet>
                     <button className="border rounded-md px-3 py-1 text-sm flex items-center gap-1 hover:bg-gray-50">
                         <FileText size={14} /> Laporan
                     </button>
@@ -252,9 +284,101 @@ export default function Hydrant({ auth }) {
                 </div>
 
             </div>
+                            {/* ─── DETAILS SHEET ─────────────────────────────────────────── */}
+                            <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+                                <SheetContent
+                                    side="right"
+                                    className="sm:max-w-none w-[50vw] overflow-y-auto"
+                                >
+                                    {selected && (
+                                        <>
+                                            {/* <SheetHeader>
+                                                <SheetTitle>
+                                                    Maklumat Insiden #{selected.id}
+                                                </SheetTitle>
+                                            </SheetHeader> */}
+            
+                                            {/* reuse your existing detail component */}
+                                            <IncidentDetails inc={selected} />
+                                        </>
+                                    )}
+                                </SheetContent>
+                            </Sheet>
         </AuthenticatedLayout>
     );
 }
+
+function IncidentDetails({ inc }) {
+    const [lat, lng] = inc.latlng.split(',').map(Number);
+
+    return (
+        <>
+            <SheetHeader>
+                <SheetTitle className="flex items-center gap-2">
+                    <Droplet className="text-blue-600" /> Butiran Pili #{inc.id}
+                </SheetTitle>
+                <SheetDescription className="text-base font-medium">
+                    {inc.lokasi}
+                </SheetDescription>
+            </SheetHeader>
+
+            <div className="overflow-y-auto max-h-[calc(100vh-8rem)] pr-2 mt-6 space-y-6 text-sm">
+                <div className="grid sm:grid-cols-2 gap-6">
+                    {/* Column 1 */}
+                    <div className="space-y-4">
+                        <Field label="ID Hidran" value={inc.id} />
+                        <Field label="Lokasi" value={inc.lokasi} />
+                        <Field label="Alamat Penuh" value={inc.alamat} />
+                        <Field label="Jenis" value={inc.jenis} />
+                    </div>
+
+                    {/* Column 2 */}
+                    <div className="space-y-4">
+                        <Field label="Status">
+                            <Badge className={`${statusColors[inc.status]} font-medium`}>
+                                {inc.status}
+                            </Badge>
+                        </Field>
+                        <Field label="Tekanan Air">
+                            <span className={tekananColors[inc.tekanan]}>{inc.tekanan}</span>
+                        </Field>
+                        <Field label="Tarikh Pemeriksaan">
+                            {inc.pemeriksaan}
+                        </Field>
+                    </div>
+                </div>
+
+                {/* Optional Note */}
+                {inc.nota && (
+                    <Field label="Nota Penyelenggaraan">
+                        <div className="bg-gray-50 text-sm p-3 rounded-md text-gray-700">
+                            {inc.nota}
+                        </div>
+                    </Field>
+                )}
+
+                {/* Leaflet Map */}
+                <Field label="Peta Lokasi GPS">
+                    <MapContainer
+                        center={[lat, lng]}
+                        zoom={16}
+                        scrollWheelZoom={false}
+                        style={{ height: '200px', borderRadius: '8px', width: '100%' }}
+                    >
+                        <TileLayer
+                            attribution="&copy; OpenStreetMap contributors"
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <Marker position={[lat, lng]}>
+                            <Popup>{inc.lokasi}</Popup>
+                        </Marker>
+                    </MapContainer>
+                </Field>
+            </div>
+        </>
+    );
+}
+
 
 function StatBox({ icon, label, value, color }) {
     return (
@@ -266,4 +390,37 @@ function StatBox({ icon, label, value, color }) {
             </div>
         </div>
     );
+}
+
+function Field({ label, value, children }) {
+    return (
+        <div>
+            <h5 className="font-medium mb-1">{label}</h5>
+            {children ? (
+                children
+            ) : (
+                <p className="text-muted-foreground">{value || '-'}</p>
+            )}
+        </div>
+    )
+}
+
+function SelectField({ label, placeholder, options = [] }) {
+    return (
+        <div>
+            <label className="block mb-1 font-medium">{label}</label>
+            <Select>
+                <SelectTrigger>
+                    <SelectValue placeholder={placeholder} />
+                </SelectTrigger>
+                <SelectContent>
+                    {options.map((opt) => (
+                        <SelectItem key={opt} value={opt}>
+                            {opt}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+    )
 }

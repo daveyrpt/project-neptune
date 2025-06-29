@@ -45,7 +45,7 @@ export default function Welcome() {
               Amaran Awal. Tindakan Pantas.
             </p>
             <p className="mt-4 max-w-2xl mx-auto">
-              Sistem FireMAS membolehkan rakyat melaporkan kecemasan kebakaran melalui WhatsApp
+              Sistem FireMAS membolehkan rakyat melaporkan kecemasan kebakaran melalui laman sosial seperti Telegram
               dan menyokong jabatan bomba dengan papan pemuka masa nyata, pemetaan hidran,
               dan laporan automatik untuk tindakan yang lebih pantas dan berkesan.
             </p>
