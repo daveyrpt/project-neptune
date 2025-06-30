@@ -93,8 +93,12 @@ class TelegramWebhookController extends Controller
         // 3️⃣ Handle any incoming text
         if ($text) {
             Log::info("💬 Received text: {$text}");
-            Cache::put("incident_draft_text_{$chatId}", $text, 300); // 5 min
-
+            Cache::put("incident_draft_text_{$chatId}", $text, 300); // 5 min\
+            $username = $message['from']['username'] ?? null;
+            if ($username) {
+                Log::info("📛 Storing username: @{$username}");
+                Cache::put("username_{$chatId}", $username, 3600);
+            }
             // 👇 Immediately ask for phone & location
             $this->askForPhoneAndLocation($chatId);
         }
