@@ -48,6 +48,7 @@ class TelegramWebhookController extends Controller
                 $fileId = $largestPhoto['file_id'];
                 Cache::put("photo_{$chatId}", $fileId, 3600);
                 Log::info("📸 Cached photo file_id: {$fileId}");
+                $this->attemptSaveIncident($chatId);
             }
 
             // 2️⃣ Handle contact (phone)
