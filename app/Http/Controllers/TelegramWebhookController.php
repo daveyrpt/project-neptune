@@ -168,7 +168,7 @@ private function checkIfReadyToSave($chatId)
 
 private function askForPhoneLocationPhoto($chatId)
 {
-    $token = config('services.telegram.token'); // store token in config
+    $token = '7908424134:AAEd5c82O2jCP0zV-f9X3nCG26ZYpaonB84';
     Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
         'chat_id' => $chatId,
         'text' => 'Sila kongsi nombor telefon, lokasi, dan gambar berkaitan insiden.',
