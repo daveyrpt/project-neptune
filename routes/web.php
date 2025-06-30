@@ -16,6 +16,7 @@ use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\SystemController;
+use App\Http\Controllers\TelegramPhotoController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\TerminalManagementController;
 use App\Http\Controllers\UserController;
@@ -154,6 +155,7 @@ Route::get('/auth/callback', [KeycloakCustomController::class, 'handleCallback']
         Route::get('/audit/pdf', [ReportController::class, 'auditPrint'])->name('report.auditPrint');
         Route::get('/statistic', [ReportController::class, 'statistic'])->name('report.statistic');
         
+        Route::get('/telegram/photo/{file_id}', [TelegramPhotoController::class, 'show']);
 
 });
 

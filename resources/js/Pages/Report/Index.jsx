@@ -530,10 +530,19 @@ function IncidentDetails({ inc }) {
                         <Field label="Alamat Penuh" value={inc.address} />
 
                         <Field label="Foto Dilampirkan">
-                            <div className="h-32 bg-muted flex items-center justify-center rounded-md">
-                                <Camera className="text-muted-foreground" />
-                            </div>
+                            {inc.photo_file_id ? (
+                                <img
+                                    src={`/telegram/photo/${inc.photo_file_id}`}
+                                    alt="Foto insiden"
+                                    className="w-full rounded-md border shadow-md"
+                                />
+                            ) : (
+                                <div className="h-32 bg-muted flex items-center justify-center rounded-md">
+                                    <Camera className="text-muted-foreground" />
+                                </div>
+                            )}
                         </Field>
+
 
                         <Field label="Lokasi GPS">
                             {/* parse "lat,lng" string to numbers */}
