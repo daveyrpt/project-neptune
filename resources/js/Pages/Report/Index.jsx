@@ -341,7 +341,8 @@ function IncidentCard({ inc, onOpen }) {
                         </div>
                     </div>
 
-                    <p className="text-muted-foreground text-sm">{inc.message.slice(0, 90)}…</p>
+                    <p className="text-muted-foreground text-sm">{inc.message?.slice(0, 90) || 'Tiada mesej'}…</p>
+
 
                     <div className="flex flex-wrap gap-6 text-sm text-muted-foreground mt-2">
                         <div className="flex items-center gap-1"><Clock size={14} /> {inc.masa} – {inc.tarikh}</div>
