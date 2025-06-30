@@ -48,7 +48,7 @@ const initialIncidents = [
         masa: '17:05',
         tarikh: '26/06/2025',
         sumber: 'WhatsApp',
-        pegawai: 'Lim Wei Kiat',
+        name: 'Lim Wei Kiat',
         phone: '+60138881234',
         address: 'No. 23, Jalan Gaya, 88000 Kota Kinabalu, Sabah',
         foto: 3,
@@ -65,7 +65,7 @@ const initialIncidents = [
         masa: '16:40',
         tarikh: '26/06/2025',
         sumber: 'Phone',
-        pegawai: 'Nurul Afiqah',
+        name: 'Nurul Afiqah',
         phone: '+60172223344',
         address: 'Jalan Coastal, Sutera Harbour, 88100 Kota Kinabalu',
         foto: 1,
@@ -82,7 +82,7 @@ const initialIncidents = [
         masa: '15:20',
         tarikh: '26/06/2025',
         sumber: 'Phone',
-        pegawai: 'Dr. Jasni Rahman',
+        name: 'Dr. Jasni Rahman',
         phone: '+60125556677',
         address: 'Jalan UMS, 88400 Kota Kinabalu',
         foto: 0,
@@ -99,7 +99,7 @@ const initialIncidents = [
         masa: '14:55',
         tarikh: '26/06/2025',
         sumber: 'WhatsApp',
-        pegawai: 'Mohd Azlan',
+        name: 'Mohd Azlan',
         phone: '+60199887766',
         address: 'Lorong Kiansom, Inanam, 88450 Kota Kinabalu',
         foto: 2,
@@ -116,7 +116,7 @@ const initialIncidents = [
         masa: '14:30',
         tarikh: '26/06/2025',
         sumber: 'Phone',
-        pegawai: 'Jessie Chong',
+        name: 'Jessie Chong',
         phone: '+60131231234',
         address: 'Jalan Kepayan, 88300 Kota Kinabalu',
         foto: 0,
@@ -133,7 +133,7 @@ const initialIncidents = [
         masa: '13:50',
         tarikh: '26/06/2025',
         sumber: 'Phone',
-        pegawai: 'Roslan Mat',
+        name: 'Roslan Mat',
         phone: '+60136778899',
         address: 'Jalan Mat Salleh, Tanjung Aru, 88100 Kota Kinabalu',
         foto: 1,
@@ -150,7 +150,7 @@ const initialIncidents = [
         masa: '12:20',
         tarikh: '26/06/2025',
         sumber: 'WhatsApp',
-        pegawai: 'Fazilah Ismail',
+        name: 'Fazilah Ismail',
         phone: '+60134442211',
         address: 'Jalan Tuaran Bypass, Likas, 88400 Kota Kinabalu',
         foto: 0,
@@ -167,7 +167,7 @@ const initialIncidents = [
         masa: '11:20',
         tarikh: '26/06/2025',
         sumber: 'Phone',
-        pegawai: 'Aina Rahim',
+        name: 'Aina Rahim',
         phone: '+60189997777',
         address: 'Lorong Sierra 5, Bandar Sierra, 89500 Kota Kinabalu',
         foto: 1,
@@ -184,7 +184,7 @@ const initialIncidents = [
         masa: '10:50',
         tarikh: '26/06/2025',
         sumber: 'Phone',
-        pegawai: 'Yusof Idris',
+        name: 'Yusof Idris',
         phone: '+60138889911',
         address: 'Jalan Putatan, 88200 Kota Kinabalu',
         foto: 0,
@@ -224,7 +224,7 @@ function createRandomIncident() {
         masa: new Date().toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' }),
         tarikh: new Date().toLocaleDateString('ms-MY'),
         sumber: 'WhatsApp',
-        pegawai: 'Pelapor Anonim',
+        name: 'Pelapor Anonim',
         phone: '',
         address: pick.address,
         foto: 0,
@@ -326,7 +326,7 @@ function IncidentCard({ inc, onOpen }) {
                     <div className="flex flex-wrap gap-6 text-sm text-muted-foreground mt-2">
                         <div className="flex items-center gap-1"><Clock size={14} /> {inc.masa} – {inc.tarikh}</div>
                         <div className="flex items-center gap-1"><MessageCircle size={14} /> {inc.sumber}</div>
-                        <div className="flex items-center gap-1"><User2 size={14} /> {inc.pegawai}</div>
+                        <div className="flex items-center gap-1"><User2 size={14} /> {inc.name}</div>
                         <div className="flex items-center gap-1"><Camera size={14} /> {inc.foto} foto</div>
                     </div>
 
@@ -377,8 +377,8 @@ function IncidentDetails({ inc }) {
                 <div className="grid sm:grid-cols-2 gap-6 text-sm">
                     {/* left column */}
                     <div className="space-y-4">
-                        <Field label="Pelapor" value={inc.pegawai} />
-                        <Field label="Telefon" value={inc.phone} />
+                        <Field label="Pelapor" value={inc.name || '-'} />
+                        <Field label="Telefon" value={inc.contact_number || '-'} />
                         <Field label="Alamat Penuh" value={inc.address} />
 
                         <Field label="Foto Dilampirkan">

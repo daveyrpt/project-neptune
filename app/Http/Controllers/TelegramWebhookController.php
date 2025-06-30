@@ -72,6 +72,12 @@ class TelegramWebhookController extends Controller
                 Cache::forget("incident_draft_text_{$chatId}");
 
                 Log::info("✅ Incident saved. ID: {$incident->id}");
+
+                $this->sendTelegramMessage($chatId, '✅ Maklumat anda telah diterima oleh Balai Bomba Kota Kinabalu.');
+
+                Cache::forget("incident_draft_text_{$chatId}");
+                Cache::forget("phone_{$chatId}");
+                Cache::forget("name_{$chatId}");
             } else {
                 Log::info("📍 Location received, but no text message cached yet for chat {$chatId}");
             }
@@ -126,4 +132,17 @@ class TelegramWebhookController extends Controller
 
     Log::info('📨 Sent phone+location request: ' . $response->body());
     }
+
+    private function sendTelegramMessage($chatId, $message)
+    {
+        $token = '7908424134:AAEd5c82O2jCP0zV-f9X3nCG26ZYpaonB84';
+
+        $response = Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+            'chat_id' => $chatId,
+            'text' => $message,
+        ]);
+
+        Log::info("📤 Sent confirmation message to {$chatId}: {$response->body()}");
+    }
+
 }
