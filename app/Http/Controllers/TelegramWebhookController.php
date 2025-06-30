@@ -10,86 +10,125 @@ use Illuminate\Support\Facades\Http;
 
 class TelegramWebhookController extends Controller
 {
-    public function handle(Request $request)
-    {
-        Log::info('🔔 Telegram webhook hit');
+public function handle(Request $request)
+{
+    Log::info('🔔 Telegram webhook hit');
 
-        try {
-            $data = $request->all();
-            Log::info('📥 Raw incoming data: ' . json_encode($data, JSON_PRETTY_PRINT));
+    try {
+        $data = $request->all();
+        Log::info('📥 Raw incoming data: ' . json_encode($data, JSON_PRETTY_PRINT));
 
-            $message = $data['message'] ?? null;
-            if (!$message) {
-                Log::warning('⚠️ No "message" field in payload.');
-                return response()->json(['ok' => false, 'message' => 'No message']);
-            }
+        $message = $data['message'] ?? null;
 
-            $chatId   = $message['chat']['id'] ?? null;
-            $from     = $message['from'] ?? [];
-            $text     = $message['text'] ?? null;
-            $location = $message['location'] ?? null;
-            $contact  = $message['contact'] ?? null;
-            $photos   = $message['photo'] ?? null;
-
-            if (!$chatId) {
-                Log::warning('⚠️ No chat_id found.');
-                return response()->json(['ok' => false, 'message' => 'No chat ID']);
-            }
-
-            // Store username if present
-            if (!empty($from['username'])) {
-                Cache::put("username_{$chatId}", $from['username'], 3600);
-                Log::info("📛 Cached username: @{$from['username']}");
-            }
-
-            // 1️⃣ Handle photo
-            if ($photos) {
-                $largestPhoto = end($photos);
-                $fileId = $largestPhoto['file_id'];
-                Cache::put("photo_{$chatId}", $fileId, 3600);
-                Log::info("📸 Cached photo file_id: {$fileId}");
-                $this->attemptSaveIncident($chatId);
-            }
-
-            // 2️⃣ Handle contact (phone)
-            if ($contact) {
-                $phone = $contact['phone_number'] ?? null;
-                $firstName = $contact['first_name'] ?? '';
-                $lastName  = $contact['last_name'] ?? '';
-                $fullName  = trim("$firstName $lastName");
-                Cache::put("phone_{$chatId}", $phone, 3600);
-                Cache::put("name_{$chatId}", $fullName, 3600);
-                Log::info("📞 Cached phone: {$phone} from {$fullName}");
-                return response()->json(['ok' => true, 'message' => 'Contact cached']);
-            }
-
-            // 3️⃣ Handle location
-            if ($location) {
-                Cache::put("lat_{$chatId}", $location['latitude'], 3600);
-                Cache::put("lng_{$chatId}", $location['longitude'], 3600);
-                Log::info("📍 Cached location: {$location['latitude']}, {$location['longitude']}");
-                $this->attemptSaveIncident($chatId);
-                return response()->json(['ok' => true, 'message' => 'Location cached']);
-            }
-
-            // 4️⃣ Handle text message
-            if ($text) {
-                Cache::put("text_{$chatId}", $text, 3600);
-                Log::info("💬 Cached message: {$text}");
-
-                // Prompt for other info
-                $this->askForDetails($chatId);
-                return response()->json(['ok' => true, 'message' => 'Text cached']);
-            }
-
-            return response()->json(['ok' => true, 'message' => 'Unhandled message type']);
-        } catch (\Throwable $e) {
-            Log::error('❌ Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);
-            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+        if (!$message) {
+            Log::warning('⚠️ No "message" field in payload.');
+            return response()->json(['ok' => false, 'message' => 'No message']);
         }
+
+        $chatId = $message['chat']['id'] ?? null;
+        $text = $message['text'] ?? null;
+        $location = $message['location'] ?? null;
+        $contact = $message['contact'] ?? null;
+        $username = $message['from']['username'] ?? null;
+        $photos = $message['photo'] ?? null;
+
+        // 1. Text
+        if ($text) {
+            Log::info("💬 Received text: {$text}");
+            Cache::put("text_{$chatId}", $text, 600);
+            if ($username) {
+                Cache::put("username_{$chatId}", $username, 600);
+            }
+            $this->askForPhoneLocationPhoto($chatId);
+        }
+
+        // 2. Contact
+        if ($contact) {
+            $phone = $contact['phone_number'] ?? null;
+            $firstName = $contact['first_name'] ?? '';
+            $lastName = $contact['last_name'] ?? '';
+            $fullName = trim("$firstName $lastName");
+            Log::info("📞 Received phone: {$phone} from {$fullName}");
+
+            Cache::put("phone_{$chatId}", $phone, 600);
+            Cache::put("name_{$chatId}", $fullName, 600);
+        }
+
+        // 3. Location
+        if ($location) {
+            Log::info("📍 Received location: lat={$location['latitude']}, lon={$location['longitude']}");
+            Cache::put("lat_{$chatId}", $location['latitude'], 600);
+            Cache::put("lng_{$chatId}", $location['longitude'], 600);
+        }
+
+        // 4. Photo
+        if ($photos) {
+            $largestPhoto = end($photos);
+            $fileId = $largestPhoto['file_id'];
+            Log::info("📸 Received photo file_id: {$fileId}");
+            Cache::put("photo_{$chatId}", $fileId, 600);
+        }
+
+        // 🔁 Always check if we can now save the incident
+        $this->checkIfReadyToSave($chatId);
+
+        return response()->json(['ok' => true]);
+
+    } catch (\Throwable $e) {
+        Log::error('❌ Error: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
     }
+}
+
+private function checkIfReadyToSave($chatId)
+{
+    $text = Cache::get("text_{$chatId}");
+    $phone = Cache::get("phone_{$chatId}");
+    $name = Cache::get("name_{$chatId}");
+    $username = Cache::get("username_{$chatId}");
+    $lat = Cache::get("lat_{$chatId}");
+    $lng = Cache::get("lng_{$chatId}");
+    $fileId = Cache::get("photo_{$chatId}");
+
+    if ($text && $phone && $lat && $lng && $fileId) {
+        Log::info("✅ All data present. Saving incident...");
+
+        $incident = new Incident();
+        $incident->source = 'telegram';
+        $incident->message = $text;
+        $incident->chat_id = $chatId;
+        $incident->contact_number = $phone;
+        $incident->name = $name ?? '';
+        $incident->username = $username ?? null;
+        $incident->latitude = $lat;
+        $incident->longitude = $lng;
+        $incident->photo_file_id = $fileId;
+        $incident->status = 'baru';
+        $incident->save();
+
+        $this->sendTelegramMessage($chatId, '✅ Terima kasih! Maklumat dan gambar anda telah diterima oleh Balai Bomba Kota Kinabalu.');
+
+        // 🧹 Clean up
+        foreach (['text', 'phone', 'name', 'username', 'lat', 'lng', 'photo'] as $key) {
+            Cache::forget("{$key}_{$chatId}");
+        }
+
+        Log::info("🗂️ Incident saved and cache cleared.");
+    } else {
+        Log::info("⏳ Waiting for more data... (Missing: " . implode(', ',
+            array_filter([
+                !$text ? 'text' : null,
+                !$phone ? 'phone' : null,
+                !$lat ? 'lat' : null,
+                !$lng ? 'lng' : null,
+                !$fileId ? 'photo' : null,
+            ])
+        ) . ")");
+    }
+}
+
 
     private function attemptSaveIncident($chatId)
     {
@@ -128,27 +167,23 @@ class TelegramWebhookController extends Controller
         }
     }
 
-    private function askForDetails($chatId)
-    {
-        $token = '7908424134:AAEd5c82O2jCP0zV-f9X3nCG26ZYpaonB84';
+private function askForPhoneLocationPhoto($chatId)
+{
+    $token = config('services.telegram.token'); // store token in config
+    Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+        'chat_id' => $chatId,
+        'text' => 'Sila kongsi nombor telefon, lokasi, dan gambar berkaitan insiden.',
+        'reply_markup' => [
+            'keyboard' => [
+                [['text' => '📞 Kongsi Nombor Telefon', 'request_contact' => true]],
+                [['text' => '📍 Kongsi Lokasi', 'request_location' => true]],
+            ],
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true,
+        ],
+    ]);
+}
 
-        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
-            'chat_id' => $chatId,
-            'text' => '📷 Sila kongsi gambar, nombor telefon dan lokasi anda untuk melengkapkan laporan.',
-            'reply_markup' => [
-                'keyboard' => [
-                    [
-                        ['text' => '📞 Kongsi Nombor Telefon', 'request_contact' => true]
-                    ],
-                    [
-                        ['text' => '📍 Kongsi Lokasi', 'request_location' => true]
-                    ]
-                ],
-                'resize_keyboard' => true,
-                'one_time_keyboard' => true,
-            ]
-        ]);
-    }
 
     private function sendTelegramMessage($chatId, $message)
     {
