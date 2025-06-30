@@ -125,8 +125,6 @@ private function checkIfReadyToSave($chatId)
         if (!$fileId) $missing[] = 'gambar';
 
         Log::info("⏳ Waiting for more data... (Missing: " . implode(', ', $missing) . ")");
-
-        $this->sendTelegramMessage($chatId, 'Sila kongsi ' . implode(' dan ', $missing) . ' untuk melengkapkan laporan.');
     }
 }
 
