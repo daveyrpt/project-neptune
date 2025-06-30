@@ -100,7 +100,7 @@ class TelegramWebhookController extends Controller
         $username = Cache::get("username_{$chatId}");
         $fileId   = Cache::get("photo_{$chatId}");
 
-        if ($text && $lat && $lng && $phone) {
+       if ($text && $lat && $lng && $phone && $fileId) { 
             $incident = new Incident();
             $incident->source = 'telegram';
             $incident->message = $text;
