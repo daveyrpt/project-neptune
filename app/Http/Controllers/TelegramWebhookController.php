@@ -161,42 +161,5 @@ class TelegramWebhookController extends Controller
         Log::info("📤 Sent to {$chatId}: {$res->body()}");
     }
 
-    private function askForPhoneAndLocation($chatId)
-    {
-        $token = '7908424134:AAEd5c82O2jCP0zV-f9X3nCG26ZYpaonB84';
-
-        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
-            'chat_id' => $chatId,
-            'text' => "Sila kongsi maklumat berikut untuk laporan:\n\n📞 Nombor Telefon\n📍 Lokasi\n📷 Gambar kejadian (jika ada)",
-            'reply_markup' => [
-                'keyboard' => [
-                    [
-                        ['text' => '📞 Kongsi Nombor Telefon', 'request_contact' => true],
-                    ],
-                    [
-                        ['text' => '📍 Kongsi Lokasi', 'request_location' => true],
-                    ],
-                    [
-                        ['text' => '📷 Hantar Gambar Kejadian'],
-                    ]
-                ],
-                'resize_keyboard' => true,
-                'one_time_keyboard' => false,
-            ],
-        ]);
-    }
-
-    private function sendTelegramMessage($chatId, $message)
-    {
-        $token = '7908424134:AAEd5c82O2jCP0zV-f9X3nCG26ZYpaonB84';
-
-        $response = Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
-            'chat_id' => $chatId,
-            'text' => $message,
-        ]);
-
-        Log::info("📤 Sent confirmation message to {$chatId}: {$response->body()}");
-    }
-
     
 }
