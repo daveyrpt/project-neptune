@@ -67,6 +67,8 @@ public function handle(Request $request)
             $fileId = $largestPhoto['file_id'];
             Log::info("📸 Received photo file_id: {$fileId}");
             Cache::put("photo_{$chatId}", $fileId, 600);
+
+            $this->askForPhoneLocationPhoto($chatId);
         }
 
         // 🔁 Always check if we can now save the incident
