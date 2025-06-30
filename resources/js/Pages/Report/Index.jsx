@@ -452,6 +452,7 @@ function IncidentCard({ inc, onOpen }) {
                     </div>
 
                     <div className="flex gap-2 justify-end mt-4">
+
                         <Sheet>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="sm" onClick={onOpen} className="gap-1">
@@ -459,11 +460,37 @@ function IncidentCard({ inc, onOpen }) {
                                 </Button>
                             </SheetTrigger>
                         </Sheet>
-                        {inc.tahap === 'New' && (
+                        {/* {inc.tahap === 'New' && (
                             <Button size="sm" className="bg-orange-600 hover:bg-orange-700 gap-1">
                                 <UserPlus size={16} /> Tugaskan
                             </Button>
-                        )}
+                        )} */}
+                                                    <Button
+                            variant="outline"
+                            className="border rounded-md px-3 py-1 text-sm flex items-center gap-1 bg-blue-600 text-white hover:bg-blue-700"
+                            onClick={() => {
+                                const phone = inc.phone || inc.contact_number;
+
+                                if (!phone) return alert('Tiada nombor telefon disediakan.');
+
+                                const cleanPhone = phone.replace(/[^0-9+]/g, '');
+
+                                if (inc.sumber?.toLowerCase() === 'whatsapp') {
+                                window.open(`https://wa.me/${cleanPhone}`, '_blank');
+                                }
+                                else if (inc.source === 'telegram' && inc.username) {
+                                    window.open(`https://t.me/${inc.username}`, '_blank');
+                                }
+                                else if (inc.sumber?.toLowerCase() === 'telegram') {
+                                // You can only use username, not phone
+                                alert('Telegram tidak menemui nama pengguna.Telegram juga tidak membenarkan pautan terus ke nombor. Sila hubungi secara manual.');
+                                } else {
+                                window.open(`tel:${cleanPhone}`);
+                                }
+                            }}
+                            >
+                            <Phone size={16} /> Hubungi Pelapor
+                            </Button>
                     </div>
                 </div>
             </div>
@@ -560,9 +587,7 @@ function IncidentDetails({ inc }) {
                             <Button className="bg-red-600 hover:bg-red-700 gap-1">
                                 <Save size={16} /> Simpan Perubahan
                             </Button>
-                            <Button variant="outline" className="gap-1">
-                                <Phone size={16} /> Hubungi Pelapor
-                            </Button>
+
                         </div>
                     </div>
                 </div>

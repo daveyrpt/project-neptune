@@ -39,12 +39,14 @@ class TelegramWebhookController extends Controller
             $firstName = $contact['first_name'] ?? '';
             $lastName = $contact['last_name'] ?? '';
             $fullName = trim("{$firstName} {$lastName}");
+            $username = $message['from']['username'] ?? null;
 
-            Log::info("📞 Received phone number: {$phone} from {$fullName} (ID: {$userId})");
+            Log::info("📞 Received phone: {$phone} from {$fullName} (ID: {$userId}, @{$username})");
 
             // Store both phone and name in cache
             Cache::put("phone_{$chatId}", $phone, 3600);
             Cache::put("name_{$chatId}", $fullName, 3600);
+            Cache::put("username_{$chatId}", $username, 3600);
 
             return response()->json(['ok' => true, 'message' => 'Phone number received']);
         }
@@ -67,6 +69,7 @@ class TelegramWebhookController extends Controller
                 $incident->status = 'baru';
                 $incident->contact_number = Cache::get("phone_{$chatId}");
                 $incident->name = Cache::get("name_{$chatId}", '');
+                $incident->username = Cache::get("username_{$chatId}");
                 $incident->save();
 
                 Cache::forget("incident_draft_text_{$chatId}");
@@ -78,6 +81,7 @@ class TelegramWebhookController extends Controller
                 Cache::forget("incident_draft_text_{$chatId}");
                 Cache::forget("phone_{$chatId}");
                 Cache::forget("name_{$chatId}");
+                Cache::forget("username_{$chatId}");
             } else {
                 Log::info("📍 Location received, but no text message cached yet for chat {$chatId}");
             }
