@@ -465,7 +465,7 @@ function IncidentCard({ inc, onOpen }) {
                                 <UserPlus size={16} /> Tugaskan
                             </Button>
                         )} */}
-                                                    <Button
+                        <Button
                             variant="outline"
                             className="border rounded-md px-3 py-1 text-sm flex items-center gap-1 bg-blue-600 text-white hover:bg-blue-700"
                             onClick={() => {
