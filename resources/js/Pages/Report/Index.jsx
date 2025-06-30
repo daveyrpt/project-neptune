@@ -266,7 +266,8 @@ export default function Index() {
    const [incidents, setIncidents] = useState(initialIncidents);
     const { toast } = useToast()
 
-const [lastSeenId, setLastSeenId] = useState(null);
+const [lastSeenId, setLastSeenId] = useState(() => localStorage.getItem('lastSeenIncidentId'));
+
 const [newIncident, setNewIncident] = useState(null);
 useEffect(() => {
     const fetchData = async () => {
@@ -283,11 +284,12 @@ useEffect(() => {
                 ];
 
                 const latest = realData[0];
-                if (latest && String(latest.id) !== String(lastSeenId)) {
-                    // new Audio('/images/siren.mp3').play();
+                const storedLastSeen = localStorage.getItem('lastSeenIncidentId');
 
-                    setNewIncident(latest); // 🔥 trigger modal
-                    setLastSeenId(latest.id);
+                if (latest && String(latest.id) !== String(storedLastSeen)) {
+                    setNewIncident(latest);                  // 🔥 trigger modal
+                    setLastSeenId(latest.id);                // 🧠 store in state
+                    localStorage.setItem('lastSeenIncidentId', latest.id); // 💾 persist
                 }
 
                 setIncidents(merged);
