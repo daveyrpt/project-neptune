@@ -117,15 +117,14 @@ private function checkIfReadyToSave($chatId)
 
         Log::info("🗂️ Incident saved and cache cleared.");
     } else {
-        Log::info("⏳ Waiting for more data... (Missing: " . implode(', ',
-            array_filter([
-                !$text ? 'text' : null,
-                !$phone ? 'phone' : null,
-                !$lat ? 'lat' : null,
-                !$lng ? 'lng' : null,
-                !$fileId ? 'photo' : null,
-            ])
-        ) . ")");
+        $missing = [];
+        if (!$phone) $missing[] = 'nombor telefon';
+        if (!$lat || !$lng) $missing[] = 'lokasi';
+        if (!$fileId) $missing[] = 'gambar';
+
+        Log::info("⏳ Waiting for more data... (Missing: " . implode(', ', $missing) . ")");
+
+        $this->sendTelegramMessage($chatId, 'Sila kongsi ' . implode(' dan ', $missing) . ' untuk melengkapkan laporan.');
     }
 }
 
