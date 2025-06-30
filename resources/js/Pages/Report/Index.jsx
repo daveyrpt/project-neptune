@@ -260,7 +260,7 @@ export default function Index() {
 
     useEffect(() => {
     const interval = setInterval(() => {
-        axios.get('/incident/latest').then((res) => {
+        axios.get('/report').then((res) => {
             const newData = res.data;
 
             // Optional: check if data length or ID has changed before updating
