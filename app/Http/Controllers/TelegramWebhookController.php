@@ -97,7 +97,7 @@ class TelegramWebhookController extends Controller
     }
 }
 
-    private function askForPhoneNumber($chatId)
+    private function askForPhoneAndLocation($chatId)
     {
         $token = '7908424134:AAEd5c82O2jCP0zV-f9X3nCG26ZYpaonB84';
 
