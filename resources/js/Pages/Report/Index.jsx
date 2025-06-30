@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Flame,
     Clock,
@@ -34,6 +34,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
+import axios from 'axios'
 /* ------------------------------------------------------------------ */
 /* 1)  initial incidents … (keep the KK ones you already have)        */
 /* ------------------------------------------------------------------ */
@@ -256,6 +257,25 @@ export default function Index() {
         ...initialIncidents  // fallback/test data
     ]);
     const { toast } = useToast()
+
+    useEffect(() => {
+    const interval = setInterval(() => {
+        axios.get('/incident/latest').then((res) => {
+            const newData = res.data;
+
+            // Optional: check if data length or ID has changed before updating
+            if (newData.length !== incidents.length || newData[0]?.id !== incidents[0]?.id) {
+                setIncidents([
+                    ...newData,
+                    ...initialIncidents,
+                ]);
+            }
+        });
+    }, 5000); // every 5 seconds
+
+    return () => clearInterval(interval);
+}, [incidents]);
+
 
     const handleSimulate = () => {
         const newIncident = createRandomIncident()
