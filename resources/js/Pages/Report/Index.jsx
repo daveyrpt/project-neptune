@@ -252,29 +252,41 @@ export default function Index() {
     const { auth, details } = usePage().props;
     console.log(details)
     const [selected, setSelected] = useState(null) // incident currently viewed
-    const [incidents, setIncidents] = useState([
-        ...details,          // real DB data
-        ...initialIncidents  // fallback/test data
-    ]);
+    // const [incidents, setIncidents] = useState([
+    //     ...details,          // real DB data
+    //     ...initialIncidents  // fallback/test data
+    // ]);
+   const [incidents, setIncidents] = useState(initialIncidents);
     const { toast } = useToast()
 
-    useEffect(() => {
-    const interval = setInterval(() => {
-        axios.get('/report').then((res) => {
-            const newData = res.data;
+const [lastId, setLastId] = useState(null);
 
-            // Optional: check if data length or ID has changed before updating
-            if (newData.length !== incidents.length || newData[0]?.id !== incidents[0]?.id) {
-                setIncidents([
-                    ...newData,
-                    ...initialIncidents,
-                ]);
+useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const res = await axios.get('/api/incidents');
+            const realData = res.data;
+
+            if (Array.isArray(realData)) {
+                const merged = [
+                    ...realData,
+                    ...initialIncidents.filter(dummy =>
+                        !realData.some(real => String(real.id) === String(dummy.id))
+                    ),
+                ];
+                setIncidents(merged);
             }
-        });
-    }, 5000); // every 5 seconds
+        } catch (error) {
+            console.error('❌ Failed to fetch real incidents:', error);
+        }
+    };
 
+    fetchData(); // first fetch
+    const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
-}, [incidents]);
+}, []);
+
+
 
 
     const handleSimulate = () => {
