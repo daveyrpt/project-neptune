@@ -29,6 +29,7 @@ class TelegramWebhookController extends Controller
         $text = $message['text'] ?? null;
         $location = $message['location'] ?? null;
         $contact = $message['contact'] ?? null;
+        $username = $message['from']['username'] ?? null;
 
         Log::info("👤 Chat ID: {$chatId}");
 
