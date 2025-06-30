@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
     Flame,
     Clock,
@@ -27,6 +27,13 @@ import {
     SheetDescription,
     SheetTrigger,
 } from '@/Components/ui/sheet'
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/Components/ui/dialog';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/Components/ui/select'
 import { Textarea } from '@/Components/ui/textarea'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -259,8 +266,8 @@ export default function Index() {
    const [incidents, setIncidents] = useState(initialIncidents);
     const { toast } = useToast()
 
-const [lastId, setLastId] = useState(null);
-
+const [lastSeenId, setLastSeenId] = useState(null);
+const [newIncident, setNewIncident] = useState(null);
 useEffect(() => {
     const fetchData = async () => {
         try {
@@ -274,19 +281,53 @@ useEffect(() => {
                         !realData.some(real => String(real.id) === String(dummy.id))
                     ),
                 ];
+
+                const latest = realData[0];
+                if (latest && String(latest.id) !== String(lastSeenId)) {
+                    // new Audio('/images/siren.mp3').play();
+
+                    setNewIncident(latest); // 🔥 trigger modal
+                    setLastSeenId(latest.id);
+                }
+
                 setIncidents(merged);
             }
         } catch (error) {
-            console.error('❌ Failed to fetch real incidents:', error);
+            console.error('❌ Failed to fetch incidents:', error);
         }
     };
 
-    fetchData(); // first fetch
+    fetchData();
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
-}, []);
+}, [lastSeenId]);
 
 
+  const hasInteracted = useRef(false);
+  const audioRef = useRef(null);
+
+  // 1️⃣ Track first user click anywhere on page
+  useEffect(() => {
+    const handleClick = () => {
+      hasInteracted.current = true;
+    };
+    window.addEventListener('click', handleClick, { once: true });
+    return () => window.removeEventListener('click', handleClick);
+  }, []);
+
+  // 2️⃣ Prepare the audio once
+  useEffect(() => {
+    audioRef.current = new Audio('/images/siren.mp3'); // Ensure this file is in /public/
+  }, []);
+
+  // 3️⃣ When new incident appears and user interacted, play sound
+  useEffect(() => {
+    if (newIncident && hasInteracted.current && audioRef.current) {
+      audioRef.current.play().catch((e) => {
+        console.warn('🔇 Sound failed:', e.message);
+      });
+    }
+  }, [newIncident]);
 
 
     const handleSimulate = () => {
@@ -302,6 +343,8 @@ useEffect(() => {
     return (
         <>
             <AuthenticatedLayout user={auth.user} currentRoute="/report">
+
+
 
                 <h1 className="text-2xl font-bold mb-4">Senarai Kecemasan</h1>
                 {/*  Simulate button  */}
@@ -327,6 +370,49 @@ useEffect(() => {
                         {selected && <IncidentDetails inc={selected} />}
                     </SheetContent>
                 </Sheet>
+
+<Dialog open={!!newIncident} onOpenChange={(open) => {
+  if (!open) {
+    setNewIncident(null);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }
+}}>
+  <DialogContent className="max-w-md border-2 border-red-500 bg-white animate-fade-in">
+    <div className="flex items-center gap-3">
+      <Flame className="text-red-600 w-6 h-6" />
+      <DialogTitle className="text-xl font-bold text-red-700">Insiden Baharu Dikesan</DialogTitle>
+    </div>
+
+    <DialogDescription className="mt-2 space-y-2 text-base">
+      <div className="text-gray-800">
+        <strong className="block">{newIncident?.lokasi}</strong>
+        <span className="text-sm text-muted-foreground">{newIncident?.tarikh} {newIncident?.masa}</span>
+      </div>
+      <p className="mt-1 text-gray-700">{newIncident?.message}</p>
+
+      <div className="pt-4 flex justify-end">
+        <Button
+          className="bg-red-600 hover:bg-red-700 gap-1"
+          onClick={() => {
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.currentTime = 0;
+            }
+            setSelected(newIncident);     // open sheet
+            setNewIncident(null);         // close modal
+          }}
+        >
+          <Eye size={16} /> Lihat Sekarang
+        </Button>
+      </div>
+    </DialogDescription>
+  </DialogContent>
+</Dialog>
+
+
             </AuthenticatedLayout>
         </>
     )
