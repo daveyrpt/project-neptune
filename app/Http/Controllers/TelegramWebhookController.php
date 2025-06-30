@@ -73,7 +73,7 @@ class TelegramWebhookController extends Controller
 
                 Log::info("✅ Incident saved. ID: {$incident->id}");
 
-                $this->sendTelegramMessage($chatId, '✅ Maklumat anda telah diterima oleh Balai Bomba Kota Kinabalu.');
+                $this->sendTelegramMessage($chatId, '✅ Terima Kasih! Maklumat anda telah diterima oleh Balai Bomba Kota Kinabalu.');
 
                 Cache::forget("incident_draft_text_{$chatId}");
                 Cache::forget("phone_{$chatId}");
